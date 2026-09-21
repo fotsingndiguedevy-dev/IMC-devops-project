@@ -1,13 +1,13 @@
 const request = require('supertest');
-const app = require('../server');
+const app = require('../app');
 
 describe('API IMC', () => {
-  
+
   test('Calcule un IMC normal (70kg, 1.75m)', async () => {
     const reponse = await request(app)
       .post('/api/imc')
       .send({ poids: 70, taille: 1.75 });
-    
+
     expect(reponse.statusCode).toBe(200);
     expect(reponse.body.imc).toBe(22.86);
     expect(reponse.body.categorie).toBe('Normal');
