@@ -1,0 +1,54 @@
+name: CI - Tests et Build
+
+# Quand exécuter ce workflow ?
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: Tests du backend
+    runs-on: ubuntu-latest    # GitHub te prête une machine Ubuntu
+
+    steps:
+      # Étape 1 : Récupérer le code
+      - name: Checkout du code
+        uses: actions/checkout@v4
+
+      # Étape 2 : Installer Node.js
+      - name: Installer Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      # Étape 3 : Installer les dépendances
+      - name: Installer les dépendances
+        run: cd backend && npm ci
+
+      # Étape 4 : Lancer les tests
+      - name: Lancer les tests
+        run: cd backend && npm test
+
+      # Étape 5 : Vérifier que le serveur démarre
+      - name: Test de démarrage
+        run: |
+          cd backend
+          node server.js &
+          sleep 3
+          curl -f http://localhost:3000/health || exit 1
+
+  docker-build:
+    name: Build de l'image Docker
+    runs-on: ubuntu-latest
+    needs: test    # Ne s'exécute que si les tests passent
+
+    steps:
+      - name: Checkout du code
+        uses: actions/checkout@v4
+
+      - name: Build de l'image Docker
+        run: docker build -t imc-backend:test ./backend

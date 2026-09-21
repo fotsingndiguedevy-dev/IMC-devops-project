@@ -1,4 +1,19 @@
+# Dépendances
 node_modules/
+
+# Variables d'environnement (SECRETS !)
 .env
-.DS_Store
+.env.local
+
+# Logs
 *.log
+npm-debug.log*
+
+# Système
+.DS_Store
+Thumbs.db
+
+# Dossiers de build
+dist/
+build/
+coverage/
